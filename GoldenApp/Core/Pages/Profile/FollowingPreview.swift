@@ -1,0 +1,38 @@
+//
+//  FollowingPreview.swift
+//  GoldenApp
+//
+//  Created by Zachary Palmer on 10/1/25.
+//
+
+import SwiftUI
+
+struct FollowingPreview: View {
+    var body: some View {
+        HStack{
+            Image("post1")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 50, height: 50)
+                .cornerRadius(200)
+                .glassEffect()
+            VStack(alignment: .leading, spacing: 4){
+                Text("Zachary Palmer")
+                    .font(.subheadline).bold()
+                    .foregroundColor(.primary)
+                Text("@zacpalmer1")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                
+            }
+            Spacer()
+            Image(systemName:"ellipsis")
+                
+        }
+        .padding(.horizontal, 20)
+    }
+}
+
+#Preview {
+    FollowingPreview()
+}

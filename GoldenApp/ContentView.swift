@@ -9,16 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if #available(iOS 26, *){
+                MyTabView()
+            }
+            else{
+                MyTabView()
+            }
         }
-        .padding()
     }
+    
 }
 
 #Preview {
     ContentView()
+        .environmentObject(TimeManager())
 }
