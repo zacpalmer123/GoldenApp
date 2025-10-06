@@ -3,9 +3,9 @@ import SwiftUI
 // MARK: - Emoji Picker Grid
 struct EmojiPicker: View {
     @Binding var selectedEmoji: String
-
+    
     let emojis = ["😀", "😂", "🥹", "😍", "😎", "🤩", "😭", "🥳", "😤", "🤯", "🫠", "👻", "💀", "❤️", "🔥", "🌈", "☀️" , "🥵"]
-
+    
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 12) {
@@ -38,11 +38,14 @@ struct UserPost: View {
     @State private var isLiked = false
     @State private var animateBounce = false
     @State private var likeCount = 12
+    @State private var hasCommented = false
     @State private var reactionCounts: [String: Int] = ["👍": 4, "🔥": 4, "🐶": 4]
     @State private var reactionPressed: [String: Bool] = ["👍": false, "🔥": false, "🐶": false]
-
+    @Environment(\.colorScheme) var colorScheme
+    var dynamicColor: Color {
+        colorScheme == .dark ? .black : .white
+    }
     let images = ["post1.4", "post1","post1.5", "post1.2", "post1.3"]
-
     var body: some View {
         NavigationStack { // ✅ Wrap the entire content
             ZStack {
@@ -110,21 +113,37 @@ struct UserPost: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         LazyHStack(spacing: 8) {
                             NavigationLink(destination: OtherProfile()) {
-                            Image("profile1")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 55, height: 55)
-                                .clipShape(Circle())
-                                .glassEffect()
-                                .padding(.leading, 20)
-                            
-                            // ✅ NavigationLink works now
-                            
+                                ZStack{
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: SwiftUI.Gradient(colors: [.purple, .orange]),
+                                                startPoint: .topTrailing,
+                                                endPoint: .bottomLeading
+                                            )
+                                        )
+                                        .frame(width: 52, height: 52)
+                                        .padding(.leading, 20)
+                                    Circle()
+                                        .frame(width: 48, height: 48)
+                                        .foregroundColor(dynamicColor)
+                                        .padding(.leading, 20)
+                                    Image("profileEH")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                    //.frame(width: 55, height: 55)
+                                        .frame(width: 44, height: 44)
+                                        .clipShape(Circle())
+                                    
+                                        .padding(.leading, 20)
+                                }
+                                // ✅ NavigationLink works now
+                                
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Zachary Palmer")
+                                    Text("Ethan Hammond")
                                         .font(.subheadline).bold()
                                         .foregroundColor(.primary)
-                                    Text("This looks really fun!")
+                                    Text("Crazy sunset today!")
                                         .font(.subheadline)
                                         .foregroundColor(.primary)
                                 }
@@ -195,8 +214,11 @@ struct UserPost: View {
                 }
             }
             .sheet(isPresented: $showMessageSheet) {
-                CommentPage()
-                    .presentationDetents([.medium, .large])
+                CommentPage {
+                    // This runs when a comment is sent
+                    hasCommented = true
+                }
+                .presentationDetents([.medium, .large])
             }
         }
     }
@@ -231,14 +253,15 @@ struct UserPost: View {
             showMessageSheet = true
         }) {
             HStack {
-                Image(systemName: "message")
+                Image(systemName: hasCommented ? "message.fill" : "message")
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.primary)
+                    .foregroundColor(hasCommented ? .blue : .primary)
                     .font(.title2)
                 Text("4")
+                    .foregroundColor(.primary)
             }
             .padding()
-            .glassEffect()
+            .glassEffect(.regular.tint(hasCommented ? .blue.opacity(0.25) : .clear.opacity(0.2)))
         }
         .buttonStyle(.plain)
     }
@@ -274,7 +297,7 @@ struct UserPost: View {
                     .id(currentCount)
             }
             .padding()
-            .glassEffect(.regular.tint(isPressed ? .yellow.opacity(0.1) : .clear.opacity(0.2)))
+            .glassEffect(.regular.tint(isPressed ? .yellow.opacity(0.1) : .clear.opacity(0.25)))
             .foregroundStyle(isPressed ? .yellow : .primary)
             .contentShape(Rectangle())
         }

@@ -25,12 +25,12 @@ class TimeManager: ObservableObject {
         let components = calendar.dateComponents([.year, .month, .day], from: now)
         
         var startSunset = calendar.dateComponents([.year, .month, .day], from: now)
-        startSunset.hour = 11
-        startSunset.minute = 05
+        startSunset.hour = 18
+        startSunset.minute = 10
 
         var endSunset = startSunset
         endSunset.hour = 19
-        endSunset.minute = 35
+        endSunset.minute = 07
 
         if let start = calendar.date(from: startSunset),
            let end = calendar.date(from: endSunset) {
@@ -39,13 +39,13 @@ class TimeManager: ObservableObject {
             isInGoldenHour = false
         }
         var startComponents = components
-        startComponents.hour = 11
-        startComponents.minute = 05
+        startComponents.hour = 18
+        startComponents.minute = 10
         startComponents.second = 0
 
         var endComponents = components
         endComponents.hour = 19
-        endComponents.minute = 05
+        endComponents.minute = 07
         endComponents.second = 0
 
         guard let startTime = calendar.date(from: startComponents),

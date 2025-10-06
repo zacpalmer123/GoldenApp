@@ -174,11 +174,10 @@ struct HorizontalPagingImageScroll: View {
 }
 struct TodaysRay: View {
     var body: some View {
-        Image("post1.5")
-            .resizable()
-            .scaledToFill()
+        VideoPickerView()
+            
             .cornerRadius(25)
-            .frame(height: 150)
+            .frame(height: 500)
             .padding(.horizontal, 20)
             
     }
@@ -394,8 +393,7 @@ struct Profile: View {
                         .padding(.top, 15)
                         .padding(.horizontal, 20)
                         TodaysRay()
-                            .padding(.top, 160)
-                            .padding(.bottom, 160)
+                            
                         HStack{
                             VStack(alignment: .leading){
                                 Text("Favorites")

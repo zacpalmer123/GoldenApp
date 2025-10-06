@@ -10,14 +10,14 @@ import SwiftUI
 struct FollowingPreview: View {
     var body: some View {
         HStack{
-            Image("post1")
+            Image("profile1")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 50, height: 50)
                 .cornerRadius(200)
                 .glassEffect()
             VStack(alignment: .leading, spacing: 4){
-                Text("Zachary Palmer")
+                Text("Zac Palmer")
                     .font(.subheadline).bold()
                     .foregroundColor(.primary)
                 Text("@zacpalmer1")

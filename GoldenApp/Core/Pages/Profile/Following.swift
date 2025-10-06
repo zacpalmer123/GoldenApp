@@ -16,7 +16,7 @@ struct Following: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        ForEach(0..<20, id: \.self){ _ in
+        ForEach(11..<20, id: \.self){ _ in
             FollowingPreview()
                 .padding(.bottom, 15)
         }

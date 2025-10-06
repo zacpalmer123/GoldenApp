@@ -32,8 +32,8 @@ struct CountdownView: View {
         if !isCountdownFinished {
             // Target countdown time
             var components = Calendar.current.dateComponents([.year, .month, .day], from: now)
-            components.hour = 11
-            components.minute = 5
+            components.hour = 18
+            components.minute = 10
             components.second = 0
             let targetTime = Calendar.current.date(from: components)!
 
@@ -62,8 +62,8 @@ struct CountdownView: View {
     private func nextTargetTimeString() -> String {
         let now = Date()
         var components = Calendar.current.dateComponents([.year, .month, .day], from: now)
-        components.hour = 11
-        components.minute = 5
+        components.hour = 18
+        components.minute = 10
         components.second = 0
         var nextTarget = Calendar.current.date(from: components)!
 

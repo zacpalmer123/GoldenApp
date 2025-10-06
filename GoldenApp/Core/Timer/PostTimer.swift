@@ -35,7 +35,7 @@ struct PostTimer: View {
         let now = Date()
         var components = Calendar.current.dateComponents([.year, .month, .day], from: now)
         components.hour = 19
-        components.minute = 05
+        components.minute = 07
 
         var next715 = Calendar.current.date(from: components)!
 

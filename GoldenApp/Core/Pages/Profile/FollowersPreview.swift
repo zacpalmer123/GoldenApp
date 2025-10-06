@@ -10,17 +10,17 @@ import SwiftUI
 struct FollowersPreview: View {
     var body: some View {
         HStack{
-            Image("profile1")
+            Image("profileEH")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 50, height: 50)
                 .cornerRadius(200)
                 .glassEffect()
             VStack(alignment: .leading, spacing: 4){
-                Text("Zac Palmer")
+                Text("Ethan Hammond")
                     .font(.subheadline).bold()
                     .foregroundColor(.primary)
-                Text("@zacpalmer1")
+                Text("@ethanhammond3")
                     .font(.caption)
                     .foregroundColor(.gray)
                 

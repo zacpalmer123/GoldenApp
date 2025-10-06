@@ -2,38 +2,18 @@ import SwiftUI
 import AVKit
 import PhotosUI
 
-// MARK: - Custom Video Player Wrapper
-struct CustomVideoPlayer: UIViewControllerRepresentable {
-    let player: AVPlayer
-
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let controller = AVPlayerViewController()
-        controller.player = player
-        controller.showsPlaybackControls = false
-        controller.videoGravity = .resizeAspectFill
-        return controller
-    }
-
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        // No updates needed
-    }
-}
-
-// MARK: - Video Picker View
-struct MyVideoPickerView: View {
+struct VideoPickerView: View {
     @State private var selectedVideo: URL? = nil
     @State private var showVideoPicker = false
     @State private var player: AVPlayer? = nil
-
+    
     var body: some View {
         ZStack {
-            // Full-screen video
             if let player = player {
-                CustomVideoPlayer(player: player)
+                PlayerLayerView(player: player)
                     .onAppear {
                         player.seek(to: .zero)
                         player.play()
-
                         // Loop video
                         NotificationCenter.default.addObserver(
                             forName: .AVPlayerItemDidPlayToEndTime,
@@ -51,24 +31,25 @@ struct MyVideoPickerView: View {
                     .ignoresSafeArea()
             } else {
                 Rectangle()
-                    .fill(Color.black.opacity(0.8))
                     .ignoresSafeArea()
-                    .overlay(Text("No video selected").foregroundColor(.white))
+                    .foregroundColor(.black)
             }
-
-            // Pick video button
-            VStack {
-                Spacer()
-                Button(action: {
-                    showVideoPicker = true
-                }) {
-                    Image(systemName: "plus")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(40)
+            
+            if player == nil { // Show button only when no video selected
+                VStack {
+                    Spacer()
+                    Button(action: {
+                        showVideoPicker = true
+                    }) {
+                        Image(systemName: "plus")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                    .padding(.bottom, 150)
                 }
-                .padding(.bottom, 150)
             }
         }
         .sheet(isPresented: $showVideoPicker) {
@@ -78,45 +59,55 @@ struct MyVideoPickerView: View {
             guard let url = newURL else { return }
             player = AVPlayer(url: url)
         }
+        .environment(\.colorScheme, .dark)
     }
 }
 
-// MARK: - Video Picker
-struct MyVideoPicker: UIViewControllerRepresentable {
-    @Binding var videoURL: URL?
+// MARK: - PlayerLayerView
+struct PlayerLayerView: UIViewRepresentable {
+    var player: AVPlayer
+    
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(playerLayer)
+        playerLayer.frame = UIScreen.main.bounds
+        view.isUserInteractionEnabled = false // touches pass through
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) { }
+}
 
+// MARK: - VideoPicker
+struct VideoPicker: UIViewControllerRepresentable {
+    @Binding var videoURL: URL?
+    
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration = PHPickerConfiguration()
         configuration.filter = .videos
         configuration.selectionLimit = 1
-
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         return picker
     }
-
+    
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) { }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
+    
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: MyVideoPicker
-
-        init(_ parent: MyVideoPicker) {
-            self.parent = parent
-        }
-
+        let parent: VideoPicker
+        init(_ parent: VideoPicker) { self.parent = parent }
+        
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.dismiss(animated: true)
-
             guard let itemProvider = results.first?.itemProvider else { return }
-
+            
             if itemProvider.hasItemConformingToTypeIdentifier("public.movie") {
-                itemProvider.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, error in
+                itemProvider.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, _ in
                     guard let url = url else { return }
-
                     let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(url.lastPathComponent)
                     try? FileManager.default.removeItem(at: tempURL)
                     do {
@@ -133,9 +124,12 @@ struct MyVideoPicker: UIViewControllerRepresentable {
     }
 }
 
+
+
 // MARK: - Preview
-struct MyVideoPickerView_Previews: PreviewProvider {
+struct VideoPickerView_Previews: PreviewProvider {
     static var previews: some View {
-        MyVideoPickerView()
+        VideoPickerView()
+            .environment(\.colorScheme, .dark)
     }
 }

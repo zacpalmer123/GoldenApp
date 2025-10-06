@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CommentInteraction: View {
+    let comment: Comment
+
     @State private var isLiked = false
     @State private var animateBounce = false
     @State private var likes = 0
@@ -32,13 +34,13 @@ struct CommentInteraction: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("Zachary Palmer")
+                    Text(comment.name)
                         .font(.subheadline).bold()
-                    Text("12:34")
+                    Text(comment.date)
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
-                Text("Wow this is a very pretty post, where was it taken? I think I've been there.")
+                Text(comment.message)
                     .font(.caption)
             }
 
@@ -66,5 +68,5 @@ struct CommentInteraction: View {
 }
 
 #Preview {
-    CommentInteraction()
+    CommentInteraction(comment: Comment(date: "2h", name: "Ava", message: "This is beautiful!"))
 }

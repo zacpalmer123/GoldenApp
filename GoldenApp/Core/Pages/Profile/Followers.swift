@@ -16,7 +16,7 @@ struct Followers: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        ForEach(0..<20, id: \.self){ _ in
+        ForEach(0..<10, id: \.self){ _ in
             FollowersPreview()
                 .padding(.bottom, 15)
         }

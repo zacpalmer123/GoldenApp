@@ -218,7 +218,7 @@ struct OtherProfile: View {
                         ZStack(alignment: .top) {
                             
                           
-                                Image("post1")
+                                Image("profileE")
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: UIScreen.main.bounds.width, height: 400 + (offset > 0 ? offset : 0))
@@ -229,7 +229,7 @@ struct OtherProfile: View {
                             VStack {
                                 Spacer()
                                 HStack(alignment: .center) {
-                                    Text("Zachary Palmer")
+                                    Text("Ethan Hammond")
                                         .padding(.vertical)
                                         .foregroundColor(.white)
                                         .font(.system(size: 34, weight: .bold))
@@ -292,10 +292,9 @@ struct OtherProfile: View {
                             }
                             Spacer()
                             
-                                            Image(systemName:  "calendar")
-                                                .font(.title)
-                                                
-                                                .foregroundStyle(.primary)
+                                            Image(systemName:  "sun.max.fill")
+                                                .font(.title2)
+                                                .symbolRenderingMode(.multicolor)
                                                 
                                                 
                                        

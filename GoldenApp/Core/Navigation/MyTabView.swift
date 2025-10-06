@@ -13,10 +13,15 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
-
+enum ActiveSheet: Identifiable {
+    case golden, activity, timer, profile, follow
+    
+    var id: Int {
+        hashValue
+    }
+}
 struct MyTabView: View {
-    @State var showGoldenSheet: Bool = false
-    @State var showActivitySheet: Bool = false
+    @State private var activeSheet: ActiveSheet?
     @State var showProfileSheet: Bool = false
     @State var showTimerSheet: Bool = false
     @State private var showCountdown = false
@@ -26,253 +31,181 @@ struct MyTabView: View {
     @State private var selectedOption = "All"
     let options = ["Everyone", "Friends"]
     var body: some View {
-            TabView {
-                Tab("Home", systemImage: "sun.max") {
-                    NavigationStack {
-                        Home()
-                            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                                print("Scroll offset: \(value)")
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    if value < -10 {
-                                        hasScrolled = true
-                                    }
-                                    scrollOffset = value
+        TabView {
+            Tab("Home", systemImage: "sun.max") {
+                NavigationStack {
+                    Home()
+                        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                            print("Scroll offset: \(value)")
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if value < -10 {
+                                    hasScrolled = true
+                                }
+                                scrollOffset = value
+                            }
+                        }
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    activeSheet = .golden
+                                }) {
+                                    Image(systemName: "sun.max.fill")
+                                        .symbolRenderingMode(.multicolor)
                                 }
                             }
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
-                                    Button(action: {
-                                        showGoldenSheet = true
-                                    }) {
-                                        Image(systemName: "sun.max.fill")
-                                            .symbolRenderingMode(.multicolor)
-                                        
-                                    }
-                                    .sheet(isPresented: $showGoldenSheet) {
-                                        GoldenSheet()
-                                            .presentationDetents([.fraction(0.3)]) // or .height(200)
-                                            .presentationDragIndicator(.hidden)
-                                    }
-                                    
-                                }
-                                
-                                ToolbarSpacer(.fixed, placement: .navigationBarLeading)
-                                
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button(action: {
-                                        showTimerSheet = true
-                                    }) {
-                                        ZStack{
-                                            CountdownView(fontSize: 20)
-                                                .frame(width: 115)
-                                                .foregroundColor(.primary)
-                                        }
-                                    }
-                                    
-                                    .sheet(isPresented: $showTimerSheet) {
-                                        
-                                        TimerPage()
-                                            .presentationDetents([.fraction(0.3)])
-                                        //                                                                        CameraTaker()
-                                        //                                                                            .presentationDetents([.large])
-                                        
-                                    }
-                                    .onAppear {
-                                        // Delay before switching to CountdownView
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                                            withAnimation(.easeInOut(duration: 1.0)) {
-                                                showCountdown = true
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    Button(action: {
-                                        showActivitySheet = true
-                                    }) {
-                                        Image(systemName: "bell.badge")
-                                            .symbolRenderingMode(.multicolor)
-                                            .foregroundColor(.primary)
-                                    }
-                                    .sheet(isPresented: $showActivitySheet) {
-                                        Activity()
-                                            .presentationDetents([.medium, .large]) // or .height(200)
-                                        
-                                    }
-                                    
-                                }
-                                ToolbarSpacer(.fixed, placement: .primaryAction)
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    NavigationLink(destination: Connect()) {
-                                        Image(systemName: "hand.wave")
-                                            .symbolRenderingMode(.multicolor)
+                            ToolbarSpacer(.fixed, placement: .navigationBarLeading)
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button(action: {
+                                    activeSheet = .timer
+                                }) {
+                                    ZStack {
+                                        CountdownView(fontSize: 20)
+                                            .frame(width: 115)
                                             .foregroundColor(.primary)
                                     }
                                 }
-                                
                             }
-                        
-                        
-                    }
-                    .background(Color.clear)
-                }
-                
-                Tab("Rays", systemImage: "sparkles") {
-                    NavigationStack {
-                        Rays()
                             
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
-                                    Button(action: {
-                                        showGoldenSheet = true
-                                    }) {
-                                        Image(systemName: "sun.max.fill")
-                                            .symbolRenderingMode(.multicolor)
-                                        
-                                    }
-                                    .sheet(isPresented: $showGoldenSheet) {
-                                        GoldenSheet()
-                                            .presentationDetents([.fraction(0.3)]) // or .height(200)
-                                            .presentationDragIndicator(.hidden)
-                                    }
-                                    
-                                }
-                                
-                                ToolbarSpacer(.fixed, placement: .navigationBarLeading)
-                                
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button(action: {
-                                        showTimerSheet = true
-                                    }) {
-                                        ZStack{
-                                            CountdownView(fontSize: 20)
-                                                .frame(width: 115)
-                                                .foregroundColor(.primary)
-                                        }
-                                    }
-                                    
-                                    .sheet(isPresented: $showTimerSheet) {
-                                        
-                                        TimerPage()
-                                            .presentationDetents([.fraction(0.3)])
-                                        //                                                                        CameraTaker()
-                                        //                                                                            .presentationDetents([.large])
-                                        
-                                    }
-                                    .onAppear {
-                                        // Delay before switching to CountdownView
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                                            withAnimation(.easeInOut(duration: 1.0)) {
-                                                showCountdown = true
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    Button(action: {
-                                        showActivitySheet = true
-                                    }) {
-                                        Image(systemName: "bell.badge")
-                                            .symbolRenderingMode(.multicolor)
-                                            .foregroundColor(.primary)
-                                    }
-                                    .sheet(isPresented: $showActivitySheet) {
-                                        Activity()
-                                            .presentationDetents([.medium, .large]) // or .height(200)
-                                        
-                                    }
-                                    
-                                }
-                                ToolbarSpacer(.fixed, placement: .primaryAction)
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    NavigationLink(destination: Connect()) {
-                                        Image(systemName: "hand.wave")
-                                            .symbolRenderingMode(.multicolor)
-                                            .foregroundColor(.primary)
-                                    }
+                            ToolbarItem(placement: .primaryAction) {
+                                Button(action: {
+                                    activeSheet = .activity
+                                }) {
+                                    Image(systemName: "bell.badge")
+                                        .symbolRenderingMode(.multicolor)
+                                        .foregroundColor(.primary)
                                 }
                             }
-                    }
+                            ToolbarSpacer(.fixed, placement: .primaryAction)
+                            ToolbarItem(placement: .primaryAction) {
+                                NavigationLink(destination: Connect()) {
+                                    Image(systemName: "hand.wave")
+                                        .symbolRenderingMode(.multicolor)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
                 }
-                
-                Tab("Profile", systemImage: "person.fill") {
-                    NavigationStack {
-                        Profile()
-                            .ignoresSafeArea()
-                        
-                            .toolbar {
-                                
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    Button(action: {
-                                        showActivitySheet = true
-                                    }) {
-                                        Image(systemName: "person.2.fill")
-                                            .foregroundColor(.primary)
-                                    }
-                                    .sheet(isPresented: $showActivitySheet) {
-                                        FollowersPage()
-                                            .presentationDetents([.medium, .large]) // or .height(200)
-                                        
-                                    }
-                                    
+                .background(Color.clear)
+            }
+            Tab("Rays", systemImage: "sparkles") {
+                NavigationStack {
+                    Rays()
+                    
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    activeSheet = .golden
+                                }) {
+                                    Image(systemName: "sun.max.fill")
+                                        .symbolRenderingMode(.multicolor)
                                 }
-                               
-                                
-                                ToolbarItem(placement: .primaryAction) {
-                                    Button(action: {
-                                        showProfileSheet = true
-                                    }) {
-                                        Image(systemName: "gear")
-                                        
-                                            .foregroundColor(.primary)
-                                    }
-                                    .sheet(isPresented: $showProfileSheet) {
-                                        ProfileSheet()
-                                            .presentationDetents([.large]) // or .height(200)
-                                            .presentationDragIndicator(.hidden)
-                                    }
-                                    
-                                }
-                                
                             }
-                            .scrollEdgeEffectStyle(.soft, for: .all)
-                    }
+                            ToolbarSpacer(.fixed, placement: .navigationBarLeading)
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button(action: {
+                                    activeSheet = .timer
+                                }) {
+                                    ZStack {
+                                        CountdownView(fontSize: 20)
+                                            .frame(width: 115)
+                                            .foregroundColor(.primary)
+                                    }
+                                }
+                            }
+                            
+                            ToolbarItem(placement: .primaryAction) {
+                                Button(action: {
+                                    activeSheet = .activity
+                                }) {
+                                    Image(systemName: "bell.badge")
+                                        .symbolRenderingMode(.multicolor)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                            ToolbarSpacer(.fixed, placement: .primaryAction)
+                            ToolbarItem(placement: .primaryAction) {
+                                NavigationLink(destination: Connect()) {
+                                    Image(systemName: "hand.wave")
+                                        .symbolRenderingMode(.multicolor)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
                     
                 }
-                Tab("Search", systemImage: "magnifyingglass", role: .search) {
-                    NavigationStack {
-                        Search()
-                            .toolbar {
-                                ToolbarItem(placement: .principal) {
-                                                            Picker("Filter", selection: $selectedOption) {
-                                                                ForEach(options, id: \.self) { option in
-                                                                    Text(option)
-                                                                        .font(.title)
-                                                                }
-                                                                
-                                                            }
-                                                            .pickerStyle(.segmented) // ✅ makes it segmented like Apple Music
-                                                            
-                                                           
-                                                            .scaleEffect(x: 1.2, y: 1.2)
-                                                            
-                                                            .frame(width: 210)        // optional: control width
-//                                                            .padding()
-//                                                            .glassEffect()
-                                                        }
-                            }
-                    }
-                }
-                
+                .environment(\.colorScheme, .dark)
             }
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .tint(.orange)
-        
+            
+            Tab("Profile", systemImage: "person.fill") {
+                NavigationStack {
+                    Profile()
+                        .ignoresSafeArea()
+                        .toolbar {
+                            ToolbarItem(placement: .primaryAction) {
+                                Button(action: {
+                                    activeSheet = .follow
+                                }) {
+                                    Image(systemName: "person.2.fill")
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                            
+                            ToolbarItem(placement: .primaryAction) {
+                                Button(action: {
+                                    activeSheet = .profile
+                                }) {
+                                    Image(systemName: "gear")
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
+                        .scrollEdgeEffectStyle(.soft, for: .all)
+                }
+            }
+            Tab("Search", systemImage: "magnifyingglass", role: .search) {
+                NavigationStack {
+                    Search()
+                        .toolbar {
+                            ToolbarItem(placement: .principal) {
+                                Picker("Filter", selection: $selectedOption) {
+                                    ForEach(options, id: \.self) { option in
+                                        Text(option)
+                                            .font(.title)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .scaleEffect(x: 1.2, y: 1.2)
+                                .frame(width: 210)
+                            }
+                        }
+                }
+            }
+            
+        }
+        .sheet(item: $activeSheet) { item in
+            switch item {
+            case .golden:
+                GoldenSheet()
+                    .presentationDetents([.fraction(0.3)])
+                    .presentationDragIndicator(.hidden)
+                
+            case .activity:
+                Activity()
+                    .presentationDetents([.medium, .large])
+                
+            case .timer:
+                TimerPage()
+                    .presentationDetents([.fraction(0.3)])
+            case .follow:
+                FollowersPage()
+                    .presentationDetents([.medium, .large])
+            case .profile:
+                ProfileSheet()
+                    .presentationDetents([.large])
+            }
+        }
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .tint(.primary)
     }
 }
 
